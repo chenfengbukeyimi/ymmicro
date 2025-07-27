@@ -1,0 +1,281 @@
+volumes:
+  ## 开发环境
+  config-db-dev-data:
+  log-db-dev-data:
+  auth-db-dev-data:
+  user-db-dev-data:
+
+  ## 生产环境
+  config-db-prod-data:
+  log-db-prod-data:
+  auth-db-prod-data:
+  user-db-prod-data:
+
+services:
+  ## 数据库服务（端口网段：7001-7999）
+  ### 开发环境
+  config-db-dev:
+    image: mysql:8
+    container_name: config-db-dev
+    ports:
+      - '7001:3306'
+    environment:
+      - MYSQL_DATABASE=config_db_dev
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+    volumes:
+      - config-db-dev-data:/var/lib/mysql
+
+  log-db-dev:
+    image: mysql:8
+    container_name: log-db-dev
+    ports:
+      - '7002:3306'
+    environment:
+      - MYSQL_DATABASE=log_db_dev
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+    volumes:
+      - log-db-dev-data:/var/lib/mysql
+
+  auth-db-dev:
+    image: mysql:8
+    container_name: auth-db-dev
+    ports:
+      - '7003:3306'
+    environment:
+      - MYSQL_DATABASE=auth_db_dev
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+    volumes:
+      - auth-db-dev-data:/var/lib/mysql
+
+  user-db-dev:
+    image: mysql:8
+    container_name: user-db-dev
+    ports:
+      - '7004:3306'
+    environment:
+      - MYSQL_DATABASE=user_db_dev
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+    volumes:
+      - user-db-dev-data:/var/lib/mysql
+
+  ### 生产环境
+
+  config-db-prod:
+    image: mysql:8
+    container_name: config-db-prod
+    ports:
+      - '7501:3306'
+    environment:
+      - MYSQL_DATABASE=config_db_prod
+      - MYSQL_ROOT_PASSWORD=xiaoyimi
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+    volumes:
+      - config-db-prod-data:/var/lib/mysql
+
+  log-db-prod:
+    image: mysql:8
+    container_name: log-db-prod
+    ports:
+      - '7502:3306'
+    environment:
+      - MYSQL_DATABASE=log_db_prod
+      - MYSQL_ROOT_PASSWORD=xiaoyimi
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+    volumes:
+      - log-db-prod-data:/var/lib/mysql
+
+  auth-db-prod:
+    image: mysql:8
+    container_name: auth-db-prod
+    ports:
+      - '7503:3306'
+    environment:
+      - MYSQL_DATABASE=auth_db_prod
+      - MYSQL_ROOT_PASSWORD=xiaoyimi
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+    volumes:
+      - auth-db-prod-data:/var/lib/mysql
+
+  user-db-prod:
+    image: mysql:8
+    container_name: user-db-prod
+    ports:
+      - '7504:3306'
+    environment:
+      - MYSQL_DATABASE=user_db_prod
+      - MYSQL_ROOT_PASSWORD=xiaoyimi
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+    volumes:
+      - user-db-prod-data:/var/lib/mysql
+
+  ## 微服务服务（端口网段：8000-8999）
+  ### 开发环境
+  ymmicro-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        - APP_NAME=ymmicro
+    volumes:
+      - .:/usr/src/ymmicro
+      - /usr/src/ymmicro/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - '8000:3000'
+    command: 'pnpm run start:dev -- ymmicro'
+
+  micro-config-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        - APP_NAME=micro-config
+    volumes:
+      - .:/usr/src/ymmicro
+      - /usr/src/ymmicro/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - '8001:3001'
+    depends_on:
+      - config-db-dev
+    command: 'pnpm run start:dev -- micro-config'
+
+  micro-log-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        - APP_NAME=micro-log
+    volumes:
+      - .:/usr/src/ymmicro
+      - /usr/src/ymmicro/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - '8002:3002'
+    depends_on:
+      - log-db-dev
+    command: 'pnpm run start:dev -- micro-log'
+
+  micro-auth-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        - APP_NAME=micro-auth
+    volumes:
+      - .:/usr/src/ymmicro
+      - /usr/src/ymmicro/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - '8003:3003'
+    depends_on:
+      - auth-db-dev
+    command: 'pnpm run start:dev -- micro-auth'
+
+  micro-user-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        - APP_NAME=micro-user
+    volumes:
+      - .:/usr/src/ymmicro
+      - /usr/src/ymmicro/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - '8004:3004'
+    depends_on:
+      - user-db-dev
+    command: 'pnpm run start:dev -- micro-user'
+
+  ### 生产环境
+  ymmicro-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - APP_NAME=ymmicro
+
+    environment:
+      - NODE_ENV=production
+    ports:
+      - '8500:3000'
+
+  micro-config-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - APP_NAME=ymmicro-config
+    environment:
+      - NODE_ENV=production
+    ports:
+      - '8501:3001'
+    depends_on:
+      - config-db-prod
+
+  micro-log-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - APP_NAME=ymmicro-log
+    environment:
+      - NODE_ENV=production
+    ports:
+      - '8502:3002'
+    depends_on:
+      - log-db-prod
+
+  micro-auth-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - APP_NAME=ymmicro-auth
+    environment:
+      - NODE_ENV=production
+    ports:
+      - '8503:3003'
+    depends_on:
+      - auth-db-prod
+
+  micro-user-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - APP_NAME=ymmicro-user
+    environment:
+      - NODE_ENV=production
+    ports:
+      - '8504:3004'
+    depends_on:
+      - user-db-prod
