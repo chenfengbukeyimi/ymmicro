@@ -7,10 +7,8 @@ RUN pnpm config set registry https://registry.npmmirror.com
 RUN mkdir -p /usr/src/ymmicro
 WORKDIR /usr/src/ymmicro
 COPY package.json ./
-COPY . .
-## 先删除后安装，解决依赖项冲突或不一致问题。
-RUN rm -rf /usr/src/ymmicro/node_modules
 RUN pnpm install
+COPY . .
 
 
 ## 构建环境
@@ -22,10 +20,8 @@ RUN pnpm config set registry https://registry.npmmirror.com
 RUN mkdir -p /usr/src/ymmicro
 WORKDIR /usr/src/ymmicro
 COPY package.json ./
-COPY . .
-## 先删除后安装，解决依赖项冲突或不一致问题。
-RUN rm -rf /usr/src/ymmicro/node_modules
 RUN pnpm install
+COPY . .
 RUN pnpm run build -- ${APP_NAME}
 
 

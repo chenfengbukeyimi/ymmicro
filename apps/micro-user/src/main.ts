@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroUserModule } from './micro-user.module';
-import { LocalPort } from '@app/common/config';
+import { LocalApps } from '@app/common/config/index';
 
 async function bootstrap() {
   const app = await NestFactory.create(MicroUserModule);
-  await app.listen(Number(LocalPort.MicroUser));
+  await app.listen(Number(LocalApps['micro-user']));
 }
 bootstrap();

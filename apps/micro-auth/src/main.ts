@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroAuthModule } from './micro-auth.module';
-import { LocalPort } from '@app/common/config';
+import { LocalApps } from '@app/common/config/index';
 
 async function bootstrap() {
   const app = await NestFactory.create(MicroAuthModule);
-  await app.listen(Number(LocalPort.MicroAuth));
+  await app.listen(Number(LocalApps['micro-auth']));
 }
 
 bootstrap();
